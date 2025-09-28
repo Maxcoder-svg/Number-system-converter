@@ -1,0 +1,40 @@
+{
+  "outputDirectory": "./",
+  "buildCommand": null,
+  "devCommand": null,
+  "installCommand": null,
+  "functions": {},
+  "routes": [
+    {
+      "src": "/sw.js",
+      "headers": { "cache-control": "max-age=0" }
+    },
+    {
+      "src": "/manifest.json",
+      "headers": { "content-type": "application/manifest+json" }
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
+    }
+  ]
+}
