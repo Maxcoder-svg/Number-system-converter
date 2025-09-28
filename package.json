@@ -1,0 +1,60 @@
+{
+  "name": "number-system-converter",
+  "version": "1.0.0",
+  "description": "A Progressive Web App that converts numbers between binary, octal, decimal, and hexadecimal systems",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "serve": "python -m http.server 8000",
+    "dev": "python -m http.server 8000",
+    "build": "echo 'No build process needed - this is a static web app'",
+    "test": "echo 'Tests will be added in future versions'",
+    "lighthouse": "lighthouse http://localhost:8000 --view",
+    "validate": "html5validator --root .",
+    "deploy": "echo 'Copy files to your web server or use a service like Netlify/Vercel'"
+  },
+  "keywords": [
+    "number-system",
+    "converter", 
+    "binary",
+    "octal",
+    "decimal",
+    "hexadecimal",
+    "pwa",
+    "progressive-web-app",
+    "calculator",
+    "education",
+    "math",
+    "programming",
+    "computer-science"
+  ],
+  "author": "Number System Converter Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Maxcoder-svg/Number-system-converter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Maxcoder-svg/Number-system-converter/issues"
+  },
+  "homepage": "https://github.com/Maxcoder-svg/Number-system-converter#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "devDependencies": {},
+  "dependencies": {},
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie <= 11"
+  ],
+  "pwa": {
+    "name": "Number System Converter",
+    "short_name": "NumConverter",
+    "theme_color": "#2196F3",
+    "background_color": "#667eea",
+    "display": "standalone",
+    "start_url": "/"
+  }
+}
