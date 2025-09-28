@@ -87,20 +87,43 @@ class NumberSystemApp {
      */
     setupPWAInstall() {
         let deferredPrompt;
+        const installBtn = document.getElementById('install-btn');
+
+        // Check if app is already installed
+        if (window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches) {
+            console.log('App is already installed');
+            return;
+        }
 
         window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('beforeinstallprompt event fired');
             // Prevent Chrome 67 and earlier from automatically showing the prompt
             e.preventDefault();
             deferredPrompt = e;
             
-            // Show custom install button
+            // Show the install button in the UI
             this.showInstallButton(deferredPrompt);
         });
 
         window.addEventListener('appinstalled', () => {
             console.log('PWA was installed');
             this.hideInstallButton();
+            this.showInstallSuccess();
         });
+
+        // For iOS Safari - show install instructions
+        if (this.isIOS() && !window.navigator.standalone) {
+            this.showIOSInstallInstructions();
+        }
+
+        // For Android browsers that don't support beforeinstallprompt
+        if (this.isAndroid() && !deferredPrompt) {
+            setTimeout(() => {
+                if (!deferredPrompt) {
+                    this.showManualInstallButton();
+                }
+            }, 3000);
+        }
     }
 
     /**
@@ -108,14 +131,52 @@ class NumberSystemApp {
      * @param {Event} deferredPrompt - The deferred install prompt
      */
     showInstallButton(deferredPrompt) {
-        const installBtn = document.createElement('button');
-        installBtn.textContent = 'Install App';
-        installBtn.className = 'install-btn';
-        installBtn.style.cssText = `
+        const installBtn = document.getElementById('install-btn');
+        
+        if (installBtn) {
+            installBtn.style.display = 'inline-block';
+            installBtn.onclick = async () => {
+                try {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log('User response to install prompt:', outcome);
+                    
+                    if (outcome === 'accepted') {
+                        this.showInstallSuccess();
+                    }
+                    
+                    deferredPrompt = null;
+                    this.hideInstallButton();
+                } catch (error) {
+                    console.error('Install prompt error:', error);
+                    this.showManualInstallInstructions();
+                }
+            };
+        }
+
+        // Also show floating install button for extra visibility
+        this.showFloatingInstallButton(deferredPrompt);
+    }
+
+    /**
+     * Show floating install button
+     * @param {Event} deferredPrompt - The deferred install prompt
+     */
+    showFloatingInstallButton(deferredPrompt) {
+        // Don't show floating button if main button is visible
+        const mainInstallBtn = document.getElementById('install-btn');
+        if (mainInstallBtn && mainInstallBtn.style.display !== 'none') {
+            return;
+        }
+
+        const floatingBtn = document.createElement('button');
+        floatingBtn.innerHTML = '📱 Install App';
+        floatingBtn.className = 'floating-install-btn';
+        floatingBtn.style.cssText = `
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: #4CAF50;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
             color: white;
             border: none;
             padding: 12px 20px;
@@ -125,27 +186,256 @@ class NumberSystemApp {
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             z-index: 1000;
             transition: all 0.3s ease;
+            font-size: 14px;
+            animation: pulse 2s infinite;
         `;
 
-        installBtn.addEventListener('click', async () => {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            console.log('User response to install prompt:', outcome);
-            deferredPrompt = null;
-            this.hideInstallButton();
+        // Add CSS animation
+        if (!document.getElementById('install-animation-style')) {
+            const style = document.createElement('style');
+            style.id = 'install-animation-style';
+            style.textContent = `
+                @keyframes pulse {
+                    0% { transform: scale(1); }
+                    50% { transform: scale(1.05); }
+                    100% { transform: scale(1); }
+                }
+                .floating-install-btn:hover {
+                    transform: translateY(-2px) scale(1.05);
+                    box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        floatingBtn.addEventListener('click', async () => {
+            try {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log('User response to install prompt:', outcome);
+                
+                if (outcome === 'accepted') {
+                    this.showInstallSuccess();
+                }
+                
+                deferredPrompt = null;
+                floatingBtn.remove();
+            } catch (error) {
+                console.error('Install prompt error:', error);
+                this.showManualInstallInstructions();
+            }
         });
 
-        document.body.appendChild(installBtn);
+        document.body.appendChild(floatingBtn);
     }
 
     /**
      * Hide install button
      */
     hideInstallButton() {
-        const installBtn = document.querySelector('.install-btn');
+        const installBtn = document.getElementById('install-btn');
         if (installBtn) {
-            installBtn.remove();
+            installBtn.style.display = 'none';
         }
+
+        const floatingBtn = document.querySelector('.floating-install-btn');
+        if (floatingBtn) {
+            floatingBtn.remove();
+        }
+    }
+
+    /**
+     * Show manual install button for browsers without beforeinstallprompt
+     */
+    showManualInstallButton() {
+        const installBtn = document.getElementById('install-btn');
+        if (installBtn) {
+            installBtn.style.display = 'inline-block';
+            installBtn.textContent = '📱 Add to Home';
+            installBtn.onclick = () => {
+                this.showManualInstallInstructions();
+            };
+        }
+    }
+
+    /**
+     * Show manual install instructions
+     */
+    showManualInstallInstructions() {
+        const isIOS = this.isIOS();
+        const isAndroid = this.isAndroid();
+        
+        let instructions = '';
+        if (isIOS) {
+            instructions = `
+                <strong>Install on iOS:</strong><br>
+                1. Tap the Share button <strong>⎋</strong><br>
+                2. Tap "Add to Home Screen"<br>
+                3. Tap "Add" to install the app
+            `;
+        } else if (isAndroid) {
+            instructions = `
+                <strong>Install on Android:</strong><br>
+                1. Tap the menu button (⋮)<br>
+                2. Tap "Add to Home screen"<br>
+                3. Tap "Add" to install the app
+            `;
+        } else {
+            instructions = `
+                <strong>Install this app:</strong><br>
+                • Chrome: Click menu → "Install Number System Converter"<br>
+                • Firefox: Look for "Add to Home Screen" option<br>
+                • Edge: Click menu → "Apps" → "Install this site as an app"
+            `;
+        }
+
+        this.showModal('Install App', instructions);
+    }
+
+    /**
+     * Show iOS install instructions
+     */
+    showIOSInstallInstructions() {
+        setTimeout(() => {
+            if (!window.navigator.standalone) {
+                this.showManualInstallButton();
+            }
+        }, 5000); // Show after 5 seconds on iOS
+    }
+
+    /**
+     * Show install success message
+     */
+    showInstallSuccess() {
+        this.showNotification('🎉 App installed successfully! You can now use it from your home screen.', 'success');
+    }
+
+    /**
+     * Check if device is iOS
+     */
+    isIOS() {
+        return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    }
+
+    /**
+     * Check if device is Android
+     */
+    isAndroid() {
+        return /Android/.test(navigator.userAgent);
+    }
+
+    /**
+     * Show modal with instructions
+     */
+    showModal(title, content) {
+        const modal = document.createElement('div');
+        modal.className = 'install-modal';
+        modal.innerHTML = `
+            <div class="modal-backdrop" onclick="this.parentElement.remove()"></div>
+            <div class="modal-content">
+                <h3>${title}</h3>
+                <div class="modal-body">${content}</div>
+                <button onclick="this.closest('.install-modal').remove()" class="btn btn-primary">Got it!</button>
+            </div>
+        `;
+        
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        `;
+
+        const style = document.createElement('style');
+        style.textContent = `
+            .modal-backdrop {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                backdrop-filter: blur(4px);
+            }
+            .modal-content {
+                background: white;
+                padding: 30px;
+                border-radius: 15px;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+                max-width: 400px;
+                margin: 20px;
+                position: relative;
+                text-align: center;
+            }
+            .modal-content h3 {
+                margin-bottom: 20px;
+                color: #333;
+            }
+            .modal-body {
+                margin-bottom: 25px;
+                line-height: 1.6;
+                color: #666;
+            }
+            .modal-body strong {
+                color: #2196F3;
+            }
+        `;
+        document.head.appendChild(style);
+        document.body.appendChild(modal);
+    }
+
+    /**
+     * Show notification message
+     */
+    showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.textContent = message;
+        
+        const backgroundColor = {
+            success: '#4CAF50',
+            error: '#f44336',
+            warning: '#FF9800',
+            info: '#2196F3'
+        }[type] || '#2196F3';
+        
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${backgroundColor};
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1500;
+            font-weight: 600;
+            max-width: 300px;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Animate in
+        setTimeout(() => {
+            notification.style.transform = 'translateX(0)';
+        }, 10);
+        
+        // Remove after delay
+        setTimeout(() => {
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }, 5000);
     }
 
     /**

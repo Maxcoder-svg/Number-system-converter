@@ -151,6 +151,35 @@ main {
     box-shadow: 0 5px 15px rgba(102, 102, 102, 0.4);
 }
 
+.btn-install {
+    background: linear-gradient(45deg, #4CAF50, #45a049);
+    color: white;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-install:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+    background: linear-gradient(45deg, #45a049, #4CAF50);
+}
+
+.btn-install:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn-install:hover:before {
+    left: 100%;
+}
+
 .btn:active {
     transform: translateY(0);
 }
