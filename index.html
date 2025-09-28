@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Convert numbers between different number systems: binary, octal, decimal, and hexadecimal">
+    <meta name="theme-color" content="#2196F3">
+    <title>Number System Converter</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Number System Converter</h1>
+            <p>Convert numbers between binary, octal, decimal, and hexadecimal systems</p>
+        </header>
+
+        <main>
+            <div class="converter-container">
+                <div class="input-section">
+                    <div class="number-system">
+                        <label for="binary-input">Binary (Base 2)</label>
+                        <input type="text" id="binary-input" placeholder="Enter binary number (e.g., 1010)" pattern="[01]*">
+                        <span class="helper-text">Only 0 and 1 allowed</span>
+                    </div>
+
+                    <div class="number-system">
+                        <label for="octal-input">Octal (Base 8)</label>
+                        <input type="text" id="octal-input" placeholder="Enter octal number (e.g., 755)" pattern="[0-7]*">
+                        <span class="helper-text">Only digits 0-7 allowed</span>
+                    </div>
+
+                    <div class="number-system">
+                        <label for="decimal-input">Decimal (Base 10)</label>
+                        <input type="text" id="decimal-input" placeholder="Enter decimal number (e.g., 42)" pattern="[0-9]*">
+                        <span class="helper-text">Only digits 0-9 allowed</span>
+                    </div>
+
+                    <div class="number-system">
+                        <label for="hexadecimal-input">Hexadecimal (Base 16)</label>
+                        <input type="text" id="hexadecimal-input" placeholder="Enter hex number (e.g., FF)" pattern="[0-9A-Fa-f]*">
+                        <span class="helper-text">Digits 0-9 and letters A-F allowed</span>
+                    </div>
+                </div>
+
+                <div class="button-section">
+                    <button id="clear-btn" class="btn btn-secondary">Clear All</button>
+                    <button id="copy-btn" class="btn btn-primary">Copy Results</button>
+                </div>
+
+                <div class="result-section">
+                    <div class="result-item">
+                        <span class="result-label">Binary:</span>
+                        <span id="binary-result" class="result-value">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Octal:</span>
+                        <span id="octal-result" class="result-value">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Decimal:</span>
+                        <span id="decimal-result" class="result-value">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Hexadecimal:</span>
+                        <span id="hexadecimal-result" class="result-value">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h2>Number System Information</h2>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h3>Binary (Base 2)</h3>
+                        <p>Uses only digits 0 and 1. Commonly used in computer science.</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Octal (Base 8)</h3>
+                        <p>Uses digits 0-7. Often used in Unix file permissions.</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Decimal (Base 10)</h3>
+                        <p>Standard number system using digits 0-9.</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Hexadecimal (Base 16)</h3>
+                        <p>Uses digits 0-9 and letters A-F. Common in programming.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 Number System Converter. Built as a Progressive Web App.</p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/converter.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

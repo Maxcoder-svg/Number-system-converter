@@ -1,0 +1,29 @@
+<svg width="192" height="192" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg192" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea"/>
+      <stop offset="100%" style="stop-color:#764ba2"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="192" height="192" fill="url(#bg192)" rx="30"/>
+  
+  <!-- Main circle -->
+  <circle cx="96" cy="96" r="70" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  
+  <!-- Binary (01) -->
+  <text x="70" y="85" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="white">01</text>
+  
+  <!-- Hex (FF) -->
+  <text x="105" y="85" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="rgba(255,255,255,0.8)">FF</text>
+  
+  <!-- Decimal (42) -->
+  <text x="70" y="115" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="rgba(255,255,255,0.9)">42</text>
+  
+  <!-- Octal (755) -->
+  <text x="105" y="115" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="rgba(255,255,255,0.7)">755</text>
+  
+  <!-- Title -->
+  <text x="96" y="150" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white">CONVERTER</text>
+</svg>
