@@ -3,7 +3,6 @@
   "buildCommand": null,
   "devCommand": null,
   "installCommand": null,
-  "functions": {},
   "routes": [
     {
       "src": "/sw.js",
