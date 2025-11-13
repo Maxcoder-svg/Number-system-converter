@@ -64,10 +64,10 @@ class NumberSystemConverter {
         this.copyBtn.addEventListener('click', () => this.copyResults());
 
         // Prevent invalid characters
-        this.binaryInput.addEventListener('keypress', (e) => this.validateInput(e, /[01]/));
-        this.octalInput.addEventListener('keypress', (e) => this.validateInput(e, /[0-7]/));
-        this.decimalInput.addEventListener('keypress', (e) => this.validateInput(e, /[0-9]/));
-        this.hexadecimalInput.addEventListener('keypress', (e) => this.validateInput(e, /[0-9A-Fa-f]/));
+        this.binaryInput.addEventListener('keypress', (e) => this.validateInput(e, /[01.]/));
+        this.octalInput.addEventListener('keypress', (e) => this.validateInput(e, /[0-7.]/));
+        this.decimalInput.addEventListener('keypress', (e) => this.validateInput(e, /[0-9.]/));
+        this.hexadecimalInput.addEventListener('keypress', (e) => this.validateInput(e, /[0-9A-Fa-f.]/));
     }
 
     /**
@@ -98,6 +98,47 @@ class NumberSystemConverter {
     }
 
     /**
+     * Convert fractional part from one base to decimal
+     * @param {string} fractionalPart - The fractional part (without the decimal point)
+     * @param {number} base - The source base
+     * @returns {number} Decimal fractional value
+     */
+    fractionalToDecimal(fractionalPart, base) {
+        let decimalValue = 0;
+        for (let i = 0; i < fractionalPart.length; i++) {
+            const digit = parseInt(fractionalPart[i], base);
+            decimalValue += digit * Math.pow(base, -(i + 1));
+        }
+        return decimalValue;
+    }
+
+    /**
+     * Convert decimal fractional part to another base
+     * @param {number} fractionalValue - The decimal fractional value (0 < value < 1)
+     * @param {number} base - The target base
+     * @param {number} precision - Number of fractional digits (default 10)
+     * @returns {string} Fractional part in target base
+     */
+    decimalFractionalToBase(fractionalValue, base, precision = 10) {
+        let result = '';
+        let value = fractionalValue;
+        let iterations = 0;
+        
+        while (value > 0 && iterations < precision) {
+            value *= base;
+            const digit = Math.floor(value);
+            result += digit.toString(base).toUpperCase();
+            value -= digit;
+            iterations++;
+        }
+        
+        // Remove trailing zeros
+        result = result.replace(/0+$/, '');
+        
+        return result || '0';
+    }
+
+    /**
      * Handle input changes and perform conversions
      * @param {string} sourceType - The type of number system that changed
      * @param {string} value - The input value
@@ -113,28 +154,55 @@ class NumberSystemConverter {
         }
 
         try {
+            // Split into integer and fractional parts
+            const parts = value.split('.');
+            const integerPart = parts[0] || '0';
+            const fractionalPart = parts[1] || '';
+            
+            // Validate that there's only one decimal point
+            if (parts.length > 2) {
+                throw new Error('Invalid number format - multiple decimal points');
+            }
+            
             // Convert to decimal first (common base for all conversions)
-            let decimalValue;
+            let decimalInteger;
+            let decimalFractional = 0;
             
             switch (sourceType) {
                 case 'binary':
-                    if (!/^[01]+$/.test(value)) throw new Error('Invalid binary number');
-                    decimalValue = parseInt(value, 2);
+                    if (!/^[01]+$/.test(integerPart)) throw new Error('Invalid binary number');
+                    if (fractionalPart && !/^[01]+$/.test(fractionalPart)) throw new Error('Invalid binary fractional part');
+                    decimalInteger = parseInt(integerPart, 2);
+                    if (fractionalPart) {
+                        decimalFractional = this.fractionalToDecimal(fractionalPart, 2);
+                    }
                     break;
                     
                 case 'octal':
-                    if (!/^[0-7]+$/.test(value)) throw new Error('Invalid octal number');
-                    decimalValue = parseInt(value, 8);
+                    if (!/^[0-7]+$/.test(integerPart)) throw new Error('Invalid octal number');
+                    if (fractionalPart && !/^[0-7]+$/.test(fractionalPart)) throw new Error('Invalid octal fractional part');
+                    decimalInteger = parseInt(integerPart, 8);
+                    if (fractionalPart) {
+                        decimalFractional = this.fractionalToDecimal(fractionalPart, 8);
+                    }
                     break;
                     
                 case 'decimal':
-                    if (!/^[0-9]+$/.test(value)) throw new Error('Invalid decimal number');
-                    decimalValue = parseInt(value, 10);
+                    if (!/^[0-9]+$/.test(integerPart)) throw new Error('Invalid decimal number');
+                    if (fractionalPart && !/^[0-9]+$/.test(fractionalPart)) throw new Error('Invalid decimal fractional part');
+                    decimalInteger = parseInt(integerPart, 10);
+                    if (fractionalPart) {
+                        decimalFractional = parseFloat('0.' + fractionalPart);
+                    }
                     break;
                     
                 case 'hexadecimal':
-                    if (!/^[0-9A-F]+$/i.test(value)) throw new Error('Invalid hexadecimal number');
-                    decimalValue = parseInt(value, 16);
+                    if (!/^[0-9A-F]+$/i.test(integerPart)) throw new Error('Invalid hexadecimal number');
+                    if (fractionalPart && !/^[0-9A-F]+$/i.test(fractionalPart)) throw new Error('Invalid hexadecimal fractional part');
+                    decimalInteger = parseInt(integerPart, 16);
+                    if (fractionalPart) {
+                        decimalFractional = this.fractionalToDecimal(fractionalPart, 16);
+                    }
                     break;
                     
                 default:
@@ -142,12 +210,15 @@ class NumberSystemConverter {
             }
 
             // Check for valid conversion
-            if (isNaN(decimalValue) || decimalValue < 0) {
+            if (isNaN(decimalInteger) || decimalInteger < 0) {
                 throw new Error('Invalid number');
             }
 
+            // Combine integer and fractional parts
+            const decimalValue = decimalInteger + decimalFractional;
+
             // Convert to all other number systems
-            this.updateResults(decimalValue, sourceType);
+            this.updateResults(decimalValue, decimalInteger, decimalFractional, sourceType);
             
         } catch (error) {
             console.error('Conversion error:', error.message);
@@ -157,18 +228,39 @@ class NumberSystemConverter {
 
     /**
      * Update all result displays
-     * @param {number} decimalValue - The decimal value to convert from
+     * @param {number} decimalValue - The complete decimal value
+     * @param {number} decimalInteger - The integer part
+     * @param {number} decimalFractional - The fractional part
      * @param {string} sourceType - The source number system
      */
-    updateResults(decimalValue, sourceType) {
-        const conversions = {
-            binary: decimalValue.toString(2),
-            octal: decimalValue.toString(8),
-            decimal: decimalValue.toString(10),
-            hexadecimal: decimalValue.toString(16).toUpperCase()
-        };
+    updateResults(decimalValue, decimalInteger, decimalFractional, sourceType) {
+        const conversions = {};
+        
+        // Convert integer parts
+        const binaryInt = decimalInteger.toString(2);
+        const octalInt = decimalInteger.toString(8);
+        const decimalInt = decimalInteger.toString(10);
+        const hexInt = decimalInteger.toString(16).toUpperCase();
+        
+        // Convert fractional parts if present
+        if (decimalFractional > 0) {
+            const binaryFrac = this.decimalFractionalToBase(decimalFractional, 2);
+            const octalFrac = this.decimalFractionalToBase(decimalFractional, 8);
+            const decimalFrac = decimalFractional.toString().split('.')[1] || '';
+            const hexFrac = this.decimalFractionalToBase(decimalFractional, 16);
+            
+            conversions.binary = binaryInt + '.' + binaryFrac;
+            conversions.octal = octalInt + '.' + octalFrac;
+            conversions.decimal = decimalInt + '.' + decimalFrac;
+            conversions.hexadecimal = hexInt + '.' + hexFrac;
+        } else {
+            conversions.binary = binaryInt;
+            conversions.octal = octalInt;
+            conversions.decimal = decimalInt;
+            conversions.hexadecimal = hexInt;
+        }
 
-        // Update all results except the source
+        // Update all results
         Object.entries(conversions).forEach(([type, result]) => {
             this.results[type].textContent = result;
             this.results[type].classList.remove('error');
