@@ -3,21 +3,25 @@
   "buildCommand": null,
   "devCommand": null,
   "installCommand": null,
-  "routes": [
-    {
-      "src": "/sw.js",
-      "headers": { "cache-control": "max-age=0" }
-    },
-    {
-      "src": "/manifest.json",
-      "headers": { "content-type": "application/manifest+json" }
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
-  ],
   "headers": [
+    {
+      "source": "/sw.js",
+      "headers": [
+        {
+          "key": "cache-control",
+          "value": "max-age=0"
+        }
+      ]
+    },
+    {
+      "source": "/manifest.json",
+      "headers": [
+        {
+          "key": "content-type",
+          "value": "application/manifest+json"
+        }
+      ]
+    },
     {
       "source": "/(.*)",
       "headers": [
