@@ -3,7 +3,7 @@
  * Handles caching and offline functionality
  */
 
-const CACHE_NAME = 'number-converter-v1.0.0';
+const CACHE_NAME = 'number-converter-v1.0.1';
 const STATIC_CACHE_NAME = `${CACHE_NAME}-static`;
 const DYNAMIC_CACHE_NAME = `${CACHE_NAME}-dynamic`;
 
@@ -15,8 +15,8 @@ const STATIC_FILES = [
     '/js/converter.js',
     '/js/app.js',
     '/manifest.json',
-    '/icons/icon-192x192.svg',
-    '/icons/icon-512x512.svg'
+    '/icons/icon-192x192.png',
+    '/icons/icon-512x512.png'
 ];
 
 // Maximum number of dynamic cache entries

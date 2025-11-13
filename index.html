@@ -11,8 +11,8 @@
     <link rel="manifest" href="manifest.json">
     
     <!-- Icons -->
-    <link rel="icon" type="image/svg+xml" href="icons/icon-192x192.svg">
-    <link rel="apple-touch-icon" href="icons/icon-192x192.svg">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
     
     <!-- Styles -->
     <link rel="stylesheet" href="styles/main.css">
@@ -29,33 +29,32 @@
                 <div class="input-section">
                     <div class="number-system">
                         <label for="binary-input">Binary (Base 2)</label>
-                        <input type="text" id="binary-input" placeholder="Enter binary number (e.g., 1010.101)" pattern="[01.]*">
-                        <span class="helper-text">Only 0, 1, and . allowed</span>
+                        <input type="text" id="binary-input" placeholder="Enter binary number (e.g., 1010)" pattern="[01]*">
+                        <span class="helper-text">Only 0 and 1 allowed</span>
                     </div>
 
                     <div class="number-system">
                         <label for="octal-input">Octal (Base 8)</label>
-                        <input type="text" id="octal-input" placeholder="Enter octal number (e.g., 755.6)" pattern="[0-7.]*">
-                        <span class="helper-text">Only digits 0-7 and . allowed</span>
+                        <input type="text" id="octal-input" placeholder="Enter octal number (e.g., 755)" pattern="[0-7]*">
+                        <span class="helper-text">Only digits 0-7 allowed</span>
                     </div>
 
                     <div class="number-system">
                         <label for="decimal-input">Decimal (Base 10)</label>
-                        <input type="text" id="decimal-input" placeholder="Enter decimal number (e.g., 42.5)" pattern="[0-9.]*">
-                        <span class="helper-text">Only digits 0-9 and . allowed</span>
+                        <input type="text" id="decimal-input" placeholder="Enter decimal number (e.g., 42)" pattern="[0-9]*">
+                        <span class="helper-text">Only digits 0-9 allowed</span>
                     </div>
 
                     <div class="number-system">
                         <label for="hexadecimal-input">Hexadecimal (Base 16)</label>
-                        <input type="text" id="hexadecimal-input" placeholder="Enter hex number (e.g., FF.8)" pattern="[0-9A-Fa-f.]*">
-                        <span class="helper-text">Digits 0-9, letters A-F, and . allowed</span>
+                        <input type="text" id="hexadecimal-input" placeholder="Enter hex number (e.g., FF)" pattern="[0-9A-Fa-f]*">
+                        <span class="helper-text">Digits 0-9 and letters A-F allowed</span>
                     </div>
                 </div>
 
                 <div class="button-section">
                     <button id="clear-btn" class="btn btn-secondary">Clear All</button>
                     <button id="copy-btn" class="btn btn-primary">Copy Results</button>
-                    <button id="install-btn" class="btn btn-install" style="display: none;">📱 Install App</button>
                 </div>
 
                 <div class="result-section">
